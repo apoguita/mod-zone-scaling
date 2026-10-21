@@ -251,8 +251,10 @@ Optional<uint8> ZoneScalingRewardLevelFor(Creature* creature, Player const* play
 
     canonical = state->CanonicalLevel;
 
+    // Warband: rewards follow the same group anchor as combat and display, so a
+    // scaled kill pays for the level it was fought at for the whole party.
     Optional<uint8> const effective = sZoneScalingMgr->GetEffectiveLevel(
-        state->ZoneId, player->GetLevel(), state->CanonicalLevel, state->Rank);
+        state->ZoneId, ZoneScalingAnchorLevel(player), state->CanonicalLevel, state->Rank);
 
     if (!effective || *effective == state->CanonicalLevel)
         return std::nullopt;

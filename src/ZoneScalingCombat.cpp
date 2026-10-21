@@ -138,8 +138,9 @@ Optional<uint8> ZoneScalingMgr::GetEffectiveLevelFor(Creature* creature, Player 
     if (!state || !state->Scalable || !state->StatsValid)
         return std::nullopt;
 
+    // Warband: the anchor is the group's top member level, not the viewer's own.
     Optional<uint8> const effective =
-        GetEffectiveLevel(state->ZoneId, player->GetLevel(), state->CanonicalLevel, state->Rank);
+        GetEffectiveLevel(state->ZoneId, ZoneScalingAnchorLevel(player), state->CanonicalLevel, state->Rank);
 
     // No band, or the direction rule left the creature where it was. Under
     // Direction = up this is the whole of the "creature above the player" case,
@@ -191,8 +192,10 @@ Optional<uint8> ZoneScalingMgr::GetViewLevelFor(Creature const* creature, Player
     if (!state || !state->Scalable || !state->StatsValid)
         return std::nullopt;
 
+    // Warband: same group anchor as GetEffectiveLevelFor, so the per-observer
+    // level display agrees with what combat actually does.
     Optional<uint8> const effective =
-        GetEffectiveLevel(state->ZoneId, player->GetLevel(), state->CanonicalLevel, state->Rank);
+        GetEffectiveLevel(state->ZoneId, ZoneScalingAnchorLevel(player), state->CanonicalLevel, state->Rank);
     if (!effective || *effective == state->CanonicalLevel)
         return std::nullopt;
 

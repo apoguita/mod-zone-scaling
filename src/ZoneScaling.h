@@ -318,6 +318,16 @@ Creature* ZoneScalingScaledCreature(Unit* unit);
 Optional<uint8> ZoneScalingRewardLevelFor(Creature* creature, Player const* player,
                                           uint8& canonical);
 
+// Warband: the level creatures present at for this player.
+//
+// The module is per-viewer by construction - every player sees its own level.
+// The Warband rule is that the *group* is the unit: every member sees the world
+// at the highest member's level, so a party of five fights the same world.
+// With ZoneScaling.GroupAnchor = 1 (the Warband default) this returns the
+// highest member level of the player's group, or the player's own level when
+// solo; with it off the plugin behaves exactly as shipped (per-viewer).
+uint8 ZoneScalingAnchorLevel(Player const* player);
+
 // What the gear banding (Z-10) would do to one item at one level, and why it
 // would decline if it declines.
 //

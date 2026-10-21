@@ -8,8 +8,10 @@
 #include "Config.h"
 #include "CreatureData.h"
 #include "DatabaseEnv.h"
+#include "Group.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "UnitDefines.h"
@@ -17,6 +19,34 @@
 
 #include <algorithm>
 #include <sstream>
+
+// Warband: which level every creature presents at for a viewer. The module
+// inside is per-viewer; the Warband rule makes the group the unit, so all
+// members see the world at the highest member's level. Opt-out (per-viewer)
+// via ZoneScaling.GroupAnchor = 0 restores the shipped behaviour exactly.
+uint8 ZoneScalingAnchorLevel(Player const* player)
+{
+    if (!player)
+        return 1;
+
+    uint8 anchor = std::max<uint8>(static_cast<uint8>(1), player->GetLevel());
+
+    if (!sConfigMgr->GetOption<bool>("ZoneScaling.GroupAnchor", true))
+        return anchor;
+
+    // Player::GetGroup() is const-qualified on a const player and returns a
+    // const group; the member list has no const iteration path, so unconst it.
+    if (Group* group = const_cast<Group*>(player->GetGroup()))
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* member = itr->GetSource())
+                anchor = std::max(anchor, member->GetLevel());
+        }
+    }
+
+    return anchor;
+}
 
 char const* ZoneScalingExclusionName(ZoneScalingExclusion reason)
 {
