@@ -342,7 +342,7 @@ struct ZoneScalingGearSwap
     uint32      ToItem       = 0;
     uint8       FromLevel    = 0;   // the original's RequiredLevel
     uint8       ToLevel      = 0;   // the replacement's RequiredLevel
-    uint32      Candidates   = 0;   // how many the pool offered within tolerance
+    uint32      Candidates   = 0;   // how many the pool offered in the allowed level band
     char const* Declined     = nullptr;
 };
 
@@ -930,7 +930,7 @@ private:
     bool   _lootMoney          = true;
     bool   _lootGear           = false;
     float  _lootMoneyMax       = 50.0f;
-    uint8  _lootGearTolerance  = 5;
+    uint8  _lootGearTolerance  = 3;
     uint8  _lootGearMaxQuality = 3;
 
     // Written from every map thread, so atomic. relaxed ordering is enough:

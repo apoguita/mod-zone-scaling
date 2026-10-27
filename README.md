@@ -119,8 +119,8 @@ that matter on first run:
 | `ZoneScaling.Loot.Enable` | `1` | master switch for the loot corrections |
 | `ZoneScaling.Loot.Money` | `1` | scale a scaled creature's coin drop to its effective level |
 | `ZoneScaling.Loot.MoneyMax` | `50.0` | cap on the coin multiplier, in either direction |
-| `ZoneScaling.Loot.Gear` | `0` | replace equipment drops with same-slot items at the effective level |
-| `ZoneScaling.Loot.Gear.Tolerance` | `5` | how many levels either side a replacement may require |
+| `ZoneScaling.Loot.Gear` | `0` | replace eligible equipment drops with same-slot items at the effective level or up to three levels below |
+| `ZoneScaling.Loot.Gear.Tolerance` | `3` | maximum levels below the effective level for replacement gear; replacements are never higher than the effective level |
 | `ZoneScaling.Loot.Gear.MaxQuality` | `3` | highest quality rebanded (2 uncommon, 3 rare, 4 epic) |
 
 ## Where scaling applies
@@ -499,10 +499,13 @@ line shows the group average rather than each member's own number. Closing that
 needs an edit to `LootHandler.cpp`, and this module does not edit the core.
 
 **Gear banding is off by default, deliberately.** With `Loot.Gear = 1`, an
-equipment drop from a scaled creature is replaced by an item of the same class,
-subclass, inventory type and quality at the effective level, drawn from an index
-built over `item_template` — 10,430 items survive the eligibility filter on a
-stock world DB. No new tables; nothing is written to your world DB.
+eligible equipment drop from a scaled creature is replaced by an item of the
+same class, subclass, inventory type and quality at the effective level or up to
+`Loot.Gear.Tolerance` levels below. Replacements are never above the effective
+level. If that slot, subclass and quality have no eligible item in the allowed
+range, the original drop is left unchanged. The index is built over
+`item_template` - 10,430 items survive the eligibility filter on a stock world
+DB. No new tables; nothing is written to your world DB.
 
 It ships off because it is a much larger claim than coin: it rewrites *which
 items the world drops*. A realm that switches it on stops being one where a

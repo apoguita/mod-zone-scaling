@@ -191,7 +191,7 @@ void ZoneScalingMgr::LoadConfig()
         std::max(sConfigMgr->GetOption<float>("ZoneScaling.Loot.MoneyMax", 50.0f), 1.0f);
 
     _lootGearTolerance =
-        uint8(std::min<uint32>(sConfigMgr->GetOption<uint32>("ZoneScaling.Loot.Gear.Tolerance", 5),
+        uint8(std::min<uint32>(sConfigMgr->GetOption<uint32>("ZoneScaling.Loot.Gear.Tolerance", 3),
                                255));
 
     _lootGearMaxQuality =

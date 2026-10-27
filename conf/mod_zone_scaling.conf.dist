@@ -719,8 +719,9 @@ ZoneScaling.Loot.MoneyMax = 50.0
 #
 #    ZoneScaling.Loot.Gear
 #        Description: Replace a scaled creature's equipment drops with items of
-#                     the same slot, subclass and quality at the effective
-#                     level, drawn from an index built over item_template. No
+#                     the same slot, subclass and quality, no more than the
+#                     configured number of levels below the effective level,
+#                     drawn from an index built over item_template. No
 #                     new tables; nothing is written to your world DB.
 #
 #                     ⚠ OFF BY DEFAULT, and it is a much larger claim than coin:
@@ -749,19 +750,20 @@ ZoneScaling.Loot.Gear = 0
 
 #
 #    ZoneScaling.Loot.Gear.Tolerance
-#        Description: How many levels either side of the effective level a
-#                     replacement may require, and equally how close an item's
-#                     own required level must already be for it to be left
-#                     alone.
+#        Description: Maximum number of levels below the effective level a
+#                     replacement may require. Replacements are never above the
+#                     effective level. An original item at or above the lower
+#                     bound is left alone.
 #
-#                     Larger values find a candidate more often and band less
-#                     precisely. Smaller values are precise but will decline on
-#                     thinly populated slots -- common ones, at higher levels.
+#                     Larger values find a candidate more often but may leave
+#                     gear further below the effective level. Smaller values
+#                     are precise but can leave an original drop unchanged if
+#                     its slot, subclass and quality have no candidate in band.
 #
-#        Default:     5
+#        Default:     3
 #
 
-ZoneScaling.Loot.Gear.Tolerance = 5
+ZoneScaling.Loot.Gear.Tolerance = 3
 
 #
 #    ZoneScaling.Loot.Gear.MaxQuality

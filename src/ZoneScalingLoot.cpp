@@ -88,7 +88,8 @@
  *
  * `OnAfterLootTemplateProcess` hands over the rolled `Loot*` before anyone sees
  * it, so an item's `itemid` can be swapped for one of the same class, subclass,
- * inventory type and quality at the effective level. That is the milestone's
+ * inventory type and quality at the effective level or up to three levels
+ * below. That is the milestone's
  * "level-banded reference loot", built from an index over `item_template` rather
  * than from new module tables -- 9,984 items in 199 slot/quality buckets on this
  * realm's world DB (the index reported that at first use, 2026-08-08), which is
@@ -395,18 +396,20 @@ bool ZoneScalingDescribeGearSwap(uint32 itemId, uint8 effectiveLevel, ZoneScalin
     }
 
     uint8 const tolerance = sZoneScalingMgr->GetLootGearTolerance();
+    uint8 const minRequiredLevel = uint8(effectiveLevel > tolerance ? effectiveLevel - tolerance : 1);
 
-    // Already close enough. Checked against the *original* rather than skipped
-    // implicitly, so a mob scaled by two levels does not reroll its whole drop
-    // table for no visible gain.
-    if (out.FromLevel + tolerance >= effectiveLevel && effectiveLevel + tolerance >= out.FromLevel)
+    // Gear already at the effective level or above it is not lowered. Gear up
+    // to `tolerance` levels below it is also close enough to leave alone.
+    if (out.FromLevel >= minRequiredLevel)
     {
-        out.Declined = "already within Loot.Gear.Tolerance of the effective level";
+        out.Declined = "already at the effective level or within Loot.Gear.Tolerance below it";
         return false;
     }
 
-    uint8 const lo = uint8(effectiveLevel > tolerance ? effectiveLevel - tolerance : 1);
-    uint8 const hi = uint8(std::min<uint32>(uint32(effectiveLevel) + tolerance, 255));
+    // Replacement gear is never above the effective level, and never more than
+    // `tolerance` levels below it.
+    uint8 const lo = minRequiredLevel;
+    uint8 const hi = effectiveLevel;
 
     auto const& entries = bucket->second;
     auto const first = std::lower_bound(entries.begin(), entries.end(), lo,

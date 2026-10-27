@@ -644,7 +644,8 @@ public:
     // function the loot hook calls, for the same reason `.zs questxp` does.
     //
     // Note that the answer is *not* stable across invocations: the substitution
-    // picks uniformly from every candidate within tolerance, so running it twice
+    // picks uniformly from every candidate in the allowed level band, so running it
+    // twice
     // gives two different items. That is the feature working, not the command
     // being flaky, and the candidate count is printed so the spread is visible.
     static bool HandleZsGearCommand(ChatHandler* handler, uint32 itemId, uint32 effectiveLevel)
@@ -676,9 +677,11 @@ public:
 
         handler->PSendSysMessage("  at level {} it would become {} ({}), required level {}.",
             effectiveLevel, swap.ToItem, to ? to->Name1 : "unknown", uint32(swap.ToLevel));
+        uint32 const minRequiredLevel = effectiveLevel > sZoneScalingMgr->GetLootGearTolerance()
+            ? effectiveLevel - sZoneScalingMgr->GetLootGearTolerance() : 1;
         handler->PSendSysMessage("  chosen at random from {} candidate(s) of the same slot, "
-            "subclass and quality within {} level(s).",
-            swap.Candidates, uint32(sZoneScalingMgr->GetLootGearTolerance()));
+            "subclass and quality, required level {}-{}.",
+            swap.Candidates, minRequiredLevel, effectiveLevel);
 
         if (!sZoneScalingMgr->IsLootGearBandingEnabled())
             handler->PSendSysMessage("  (gear banding is currently off.)");
